@@ -15,8 +15,7 @@ export default class RubocopAutocorrectProvider
     const config = getConfig();
     try {
       const args = [...getCommandArguments(document.fileName), ...additionalArguments];
-      if (additionalArguments.length === 0) args.push('--autocorrect');
-
+      if (additionalArguments.length === 0) args.push(config.autocorrectArg);
       if (config.useServer) {
         args.push('--server');
       }

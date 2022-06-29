@@ -7,6 +7,7 @@ import { log } from './channel';
 
 export interface RubocopConfig {
   command: string;
+  autocorrectArg: string;
   onSave: boolean;
   autocorrectOnSave: boolean;
   configFilePath: string;
@@ -81,6 +82,7 @@ export const getConfig: () => RubocopConfig = () => {
 
   return {
     command,
+    autocorrectArg: conf.get('autocorrectArg', '--autocorrect'),
     configFilePath: conf.get('configFilePath', ''),
     onSave: conf.get('onSave', true),
     autocorrectOnSave: conf.get('autocorrectOnSave', false),
