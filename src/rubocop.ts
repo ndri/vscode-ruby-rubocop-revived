@@ -19,6 +19,11 @@ export class RubocopAutocorrectProvider
         ...getCommandArguments(document.fileName),
         '--autocorrect',
       ];
+
+      if (config.useServer) {
+        args.push('--server');
+      }
+      
       const options = {
         cwd: getCurrentPath(document.uri),
         input: document.getText(),

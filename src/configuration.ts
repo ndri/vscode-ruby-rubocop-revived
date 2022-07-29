@@ -9,6 +9,7 @@ export interface RubocopConfig {
   onSave: boolean;
   configFilePath: string;
   useBundler: boolean;
+  useServer: boolean;
   suppressRubocopWarnings: boolean;
 }
 
@@ -75,6 +76,7 @@ export const getConfig: () => RubocopConfig = () => {
     configFilePath: conf.get('configFilePath', ''),
     onSave: conf.get('onSave', true),
     useBundler,
+    useServer,
     suppressRubocopWarnings,
   };
 };
