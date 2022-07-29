@@ -1,4 +1,9 @@
-# Rubocop for Visual Studio Code
+
+
+# Rubocop for Visual Studio Code - revived
+It seemds the original extension at [https://github.com/misogi/vscode-ruby-rubocop](https://github.com/misogi/vscode-ruby-rubocop) is no longer being maintained. Let's pick it up from here.
+
+# Docs from original repo
 
 ![travis status](https://travis-ci.org/misogi/vscode-ruby-rubocop.svg?branch=master)
 
