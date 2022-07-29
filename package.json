@@ -1,16 +1,16 @@
 {
-  "name": "ruby-rubocop",
-  "version": "0.8.6",
-  "publisher": "misogi",
-  "displayName": "ruby-rubocop",
+  "name": "ruby-rubocop-revived",
+  "version": "0.9.0",
+  "publisher": "LoranKloeze",
+  "displayName": "ruby-rubocop-revived",
   "description": "execute rubocop for current Ruby code.",
   "engines": {
     "vscode": "^1.62.0"
   },
-  "icon": "images/rubocop.png",
+  "icon": "images/rubocop_revived.png",
   "repository": {
     "type": "git",
-    "url": "https://github.com/misogi/vscode-ruby-rubocop.git"
+    "url": "https://github.com/LoranKloeze/vscode-ruby-rubocop-revived"
   },
   "categories": [
     "Programming Languages",
