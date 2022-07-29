@@ -85,6 +85,11 @@
           "default": false,
           "description": "execute rubocop using bundler (ie 'bundle exec rubocop')"
         },
+        "ruby.rubocop.useServer": {
+          "type": "boolean",
+          "default": false,
+          "description": "start a Rubocop server for faster execution (since Rubocop 1.31)"
+        },
         "ruby.rubocop.suppressRubocopWarnings": {
           "type": "boolean",
           "default": false,

@@ -48,9 +48,11 @@ export const getConfig: () => RubocopConfig = () => {
   const cmd = win32 ? 'rubocop.bat' : 'rubocop';
   const conf = vs.workspace.getConfiguration('ruby.rubocop');
   let useBundler = conf.get('useBundler', false);
+  let useServer = conf.get('useServer', false);
   const configPath = conf.get('executePath', '');
   const suppressRubocopWarnings = conf.get('suppressRubocopWarnings', false);
   let command: string;
+  console.debug('Using Rubocop server: ' + useServer);
 
   // if executePath is present in workspace config, use it.
   if (configPath.length !== 0) {
