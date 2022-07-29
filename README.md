@@ -1,7 +1,9 @@
 
 
 # Rubocop for Visual Studio Code - revived
-It seems the original extension at [https://github.com/misogi/vscode-ruby-rubocop](https://github.com/misogi/vscode-ruby-rubocop) is no longer being maintained. Let's pick it up from here.
+It seems the original extension at is no longer being maintained. Let's pick it up from here.
+
+Marketplace: [https://marketplace.visualstudio.com/items?itemName=LoranKloeze.ruby-rubocop-revived](https://marketplace.visualstudio.com/items?itemName=LoranKloeze.ruby-rubocop-revived)
 
 # Docs from original repo
 
@@ -12,8 +14,6 @@ Visual Studio Code で rubocop を実行するエクステンションです。
 This extension provides interfaces to rubocop for vscode.
 
 [rubocop](https://github.com/bbatsov/rubocop) is a code analyzer for ruby.
-
-[ruby rubocop in Code Market Place](https://marketplace.visualstudio.com/items/misogi.ruby-rubocop)
 
 ![exec on save](./images/onsave.gif)
 
