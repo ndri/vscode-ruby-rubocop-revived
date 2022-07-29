@@ -1,3 +1,7 @@
+# 0.9.0
+- Replace deprecated Rubocop argument --auto-correct with --autocorrect
+- Add a configuration option to run Rubocop in server mode (to speed up things). This option is available from >= Rubocop 1.31.
+
 # 0.8.6
 
 - Info level cops are displayed as info level
