@@ -47,11 +47,11 @@
     "commands": [
       {
         "command": "ruby.rubocop",
-        "title": "Ruby: lint by rubocop"
+        "title": "Ruby: Lint by Rubocop"
       },
       {
         "command": "editor.action.formatDocument",
-        "title": "Ruby: autocorrect by rubocop"
+        "title": "Ruby: Autocorrect by Rubocop"
       }
     ],
     "keybindings": [
