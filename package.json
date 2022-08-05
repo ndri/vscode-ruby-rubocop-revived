@@ -50,7 +50,8 @@
         "title": "Ruby: Lint by Rubocop"
       },
       {
-        "command": "editor.action.formatDocument",
+        "command": "ruby.rubocop.autocorrect",
+        "when": "editorLangId == 'ruby' || editorLangId == 'gemfile'",
         "title": "Ruby: Autocorrect by Rubocop"
       }
     ],
