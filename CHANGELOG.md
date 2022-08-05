@@ -1,3 +1,6 @@
+# 0.9.1
+- Changed command description case style to match other extensions
+- Fixed bug where running 'Ruby: Autocorrect by Rubocop' would run the default formatter instead of Rubocop (thanks [@jvilk-stripe](https://github.com/jvilk-stripe), see https://github.com/LoranKloeze/vscode-ruby-rubocop-revived/issues/1#issue-1329266889) 
 # 0.9.0
 - Replace deprecated Rubocop argument --auto-correct with --autocorrect
 - Add a configuration option to run Rubocop in server mode (to speed up things). This option is available from >= Rubocop 1.31.
