@@ -209,6 +209,10 @@ export class Rubocop {
     return this.config.onSave;
   }
 
+  public get autocorrectOnSave(): boolean {
+    return this.config.autocorrectOnSave;
+  }
+
   public clear(document: vscode.TextDocument): void {
     const uri = document.uri;
     if (isFileUri(uri)) {

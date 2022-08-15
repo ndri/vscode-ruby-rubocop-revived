@@ -7,6 +7,7 @@ import { Rubocop } from './rubocop';
 export interface RubocopConfig {
   command: string;
   onSave: boolean;
+  autocorrectOnSave: boolean;
   configFilePath: string;
   useBundler: boolean;
   useServer: boolean;
@@ -75,6 +76,7 @@ export const getConfig: () => RubocopConfig = () => {
     command,
     configFilePath: conf.get('configFilePath', ''),
     onSave: conf.get('onSave', true),
+    autocorrectOnSave: conf.get('autocorrectOnSave', false),
     useBundler,
     useServer,
     suppressRubocopWarnings,

@@ -29,6 +29,10 @@ export function activate(context: vscode.ExtensionContext): void {
     rubocop.execute(e);
   });
 
+  ws.onWillSaveTextDocument(() => {
+    if (rubocop.isOnSave && rubocop.autocorrectOnSave) vscode.commands.executeCommand('ruby.rubocop.autocorrect');
+  });
+
   ws.onDidSaveTextDocument((e: vscode.TextDocument) => {
     if (rubocop.isOnSave) {
       rubocop.execute(e);

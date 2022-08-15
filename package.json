@@ -91,6 +91,11 @@
           "default": false,
           "description": "start a Rubocop server for faster execution (since Rubocop 1.31)"
         },
+        "ruby.rubocop.autocorrectOnSave": {
+          "type": "boolean",
+          "default": false,
+          "description": "autocorrect files on save (requires `ruby.rubocop.onSave` to be set to `true`)"
+        },
         "ruby.rubocop.suppressRubocopWarnings": {
           "type": "boolean",
           "default": false,
