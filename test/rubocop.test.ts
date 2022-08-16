@@ -32,12 +32,11 @@ describe('Rubocop', () => {
         'file_with_warnings.rb',
         fileWithWarnings
       );
-      await helper.openFile(filePath);
+      const editor = await helper.openFile(filePath);
       expect(instance.executeAutocorrectOnSave()).to.be.equal(false);
 
-      await helper.sleep(1000);
-      const fileAfterAutocorrect =
-        vscode.window.activeTextEditor?.document?.getText();
+      await helper.sleep(500);
+      const fileAfterAutocorrect = editor.document?.getText();
 
       // Assert that there have been no changes
       expect(fileAfterAutocorrect).to.be.equal(fileWithWarnings);
@@ -45,7 +44,8 @@ describe('Rubocop', () => {
       fs.unlinkSync(filePath);
     });
 
-    it('works when config option is enabled', async () => {
+    it('works when config option is enabled', async function () {
+      this.timeout(5000);
       await helper.closeAllEditors();
 
       instance.config = {
@@ -58,11 +58,11 @@ describe('Rubocop', () => {
         'file_with_warnings.rb',
         fileWithWarnings
       );
-      await helper.openFile(filePath);
+      const editor = await helper.openFile(filePath);
       expect(instance.executeAutocorrectOnSave()).to.be.equal(true);
 
-      const fileAfterAutocorrect =
-        vscode.window.activeTextEditor?.document?.getText();
+      await helper.sleep(500)
+      const fileAfterAutocorrect = editor.document?.getText();
 
       // Assert that there have been changes
       expect(fileAfterAutocorrect).not.to.be.equal(fileWithWarnings);

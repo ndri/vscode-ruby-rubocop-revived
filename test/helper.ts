@@ -16,10 +16,9 @@ export async function closeAllEditors() {
   );
 }
 
-export async function openFile(fileName: string): Promise<vscode.TextDocument> {
-  const document = vscode.workspace.openTextDocument(fileName);
-  vscode.window.showTextDocument(await document);
-  return document;
+export async function openFile(fileName: string): Promise<vscode.TextEditor> {
+  const document = await vscode.workspace.openTextDocument(fileName);
+  return await vscode.window.showTextDocument(document);
 }
 
 export function createTempFile(fileName: string, content: string): string {
