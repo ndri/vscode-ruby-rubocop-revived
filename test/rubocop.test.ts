@@ -24,8 +24,8 @@ describe('Rubocop', () => {
   });
 
   describe('autocorrectOnSave', () => {
-    it('does not work when config option is disabled', async function() {
-      this.timeout(5000)
+    it('does not work when config option is disabled', async function () {
+      this.timeout(5000);
       await helper.closeAllEditors();
 
       const filePath = helper.createTempFile(
@@ -33,7 +33,7 @@ describe('Rubocop', () => {
         fileWithWarnings
       );
       await helper.openFile(filePath);
-      expect(await instance.executeAutocorrect()).to.be.equal(false);
+      expect(instance.executeAutocorrectOnSave()).to.be.equal(false);
 
       await helper.sleep(1000);
       const fileAfterAutocorrect =
@@ -59,7 +59,7 @@ describe('Rubocop', () => {
         fileWithWarnings
       );
       await helper.openFile(filePath);
-      expect(await instance.executeAutocorrect()).to.be.equal(true);
+      expect(instance.executeAutocorrectOnSave()).to.be.equal(true);
 
       const fileAfterAutocorrect =
         vscode.window.activeTextEditor?.document?.getText();

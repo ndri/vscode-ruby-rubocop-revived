@@ -118,6 +118,7 @@ function getCommandArguments(fileName: string): string[] {
 
 export class Rubocop {
   public config: RubocopConfig;
+  public formattingProvider: RubocopAutocorrectProvider;
   private diag: vscode.DiagnosticCollection;
   private additionalArguments: string[];
   private taskQueue: TaskQueue = new TaskQueue();
@@ -129,12 +130,33 @@ export class Rubocop {
     this.diag = diagnostics;
     this.additionalArguments = additionalArguments;
     this.config = getConfig();
+    this.formattingProvider = new RubocopAutocorrectProvider();
   }
 
-  public async executeAutocorrect(): Promise<boolean> {
+  public executeAutocorrectOnSave(): boolean {
     if (!this.isOnSave || !this.autocorrectOnSave) return false;
 
-    return await vscode.commands.executeCommand('ruby.rubocop.autocorrect');
+    return this.executeAutocorrect();
+  }
+
+  public executeAutocorrect(): boolean {
+    vscode.window.activeTextEditor?.edit((editBuilder) => {
+      const document = vscode.window.activeTextEditor.document;
+      const edits =
+        this.formattingProvider.provideDocumentFormattingEdits(document);
+      // We only expect one edit from our formatting provider.
+      if (edits.length === 1) {
+        const edit = edits[0];
+        editBuilder.replace(edit.range, edit.newText);
+      }
+      if (edits.length > 1) {
+        throw new Error(
+          'Unexpected error: Rubocop document formatter returned multiple edits.'
+        );
+      }
+    });
+
+    return true;
   }
 
   public execute(document: vscode.TextDocument, onComplete?: () => void): void {
@@ -158,7 +180,11 @@ export class Rubocop {
         return;
       }
 
-      this.diag.delete(uri);
+      try {
+        this.diag.delete(uri);
+      } catch (e) {
+        console.debug('Deleting diagnostics failed');
+      }
 
       const entries: [vscode.Uri, vscode.Diagnostic[]][] = [];
       rubocop.files.forEach((file: RubocopFile) => {
@@ -179,7 +205,11 @@ export class Rubocop {
         entries.push([uri, diagnostics]);
       });
 
-      this.diag.set(entries);
+      try {
+        this.diag.set(entries);
+      } catch (e) {
+        console.debug('Adding diagnostics failed');
+      }
     };
 
     const jsonOutputFormat = ['--format', 'json'];
