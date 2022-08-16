@@ -54,7 +54,6 @@ export const getConfig: () => RubocopConfig = () => {
   const configPath = conf.get('executePath', '');
   const suppressRubocopWarnings = conf.get('suppressRubocopWarnings', false);
   let command: string;
-  console.debug('Using Rubocop server: ' + useServer);
 
   // if executePath is present in workspace config, use it.
   if (configPath.length !== 0) {

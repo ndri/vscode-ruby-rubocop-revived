@@ -30,7 +30,7 @@ export function activate(context: vscode.ExtensionContext): void {
   });
 
   ws.onWillSaveTextDocument(() => {
-    if (rubocop.isOnSave && rubocop.autocorrectOnSave) vscode.commands.executeCommand('ruby.rubocop.autocorrect');
+    rubocop.executeAutocorrect();
   });
 
   ws.onDidSaveTextDocument((e: vscode.TextDocument) => {
@@ -52,20 +52,28 @@ export function activate(context: vscode.ExtensionContext): void {
     formattingProvider
   );
 
-const autocorrectDisposable = vscode.commands.registerCommand('ruby.rubocop.autocorrect', () => {
-  vscode.window.activeTextEditor.edit((editBuilder) => {
-    const document = vscode.window.activeTextEditor.document;
-    const edits = formattingProvider.provideDocumentFormattingEdits(document);
-    // We only expect one edit from our formatting provider.
-    if (edits.length === 1) {
-      const edit = edits[0];
-      editBuilder.replace(edit.range, edit.newText);
-    }
-    if (edits.length > 1) {
-      throw new Error("Unexpected error: Rubocop document formatter returned multiple edits.");
-    }
-  });
-});
+  const autocorrectDisposable = vscode.commands.registerCommand(
+    'ruby.rubocop.autocorrect',
+    () => {
+      vscode.window.activeTextEditor?.edit((editBuilder) => {
+        const document = vscode.window.activeTextEditor.document;
+        const edits =
+          formattingProvider.provideDocumentFormattingEdits(document);
+        // We only expect one edit from our formatting provider.
+        if (edits.length === 1) {
+          const edit = edits[0];
+          editBuilder.replace(edit.range, edit.newText);
+        }
+        if (edits.length > 1) {
+          throw new Error(
+            'Unexpected error: Rubocop document formatter returned multiple edits.'
+          );
+        }
+      });
 
-context.subscriptions.push(autocorrectDisposable);
+      return true;
+    }
+  );
+
+  context.subscriptions.push(autocorrectDisposable);
 }

@@ -15,15 +15,12 @@ export class RubocopAutocorrectProvider
   ): vscode.TextEdit[] {
     const config = getConfig();
     try {
-      const args = [
-        ...getCommandArguments(document.fileName),
-        '--autocorrect',
-      ];
+      const args = [...getCommandArguments(document.fileName), '--autocorrect'];
 
       if (config.useServer) {
         args.push('--server');
       }
-      
+
       const options = {
         cwd: getCurrentPath(document.uri),
         input: document.getText(),
@@ -132,6 +129,12 @@ export class Rubocop {
     this.diag = diagnostics;
     this.additionalArguments = additionalArguments;
     this.config = getConfig();
+  }
+
+  public async executeAutocorrect(): Promise<boolean> {
+    if (!this.isOnSave || !this.autocorrectOnSave) return false;
+
+    return await vscode.commands.executeCommand('ruby.rubocop.autocorrect');
   }
 
   public execute(document: vscode.TextDocument, onComplete?: () => void): void {

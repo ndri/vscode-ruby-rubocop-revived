@@ -4,3 +4,4 @@ npm-debug.log*
 out
 src/*.js
 *.vsix
+# test/tmp/**/*
