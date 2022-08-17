@@ -1,3 +1,5 @@
+# 0.9.2
+- Addded option to autocorrect a file on save (thanks [@Verseth](https://github.com/Verseth)
 # 0.9.1
 - Changed command description case style to match other extensions
 - Fixed bug where running 'Ruby: Autocorrect by Rubocop' would run the default formatter instead of Rubocop (thanks [@jvilk-stripe](https://github.com/jvilk-stripe), see https://github.com/LoranKloeze/vscode-ruby-rubocop-revived/issues/1#issue-1329266889) 
