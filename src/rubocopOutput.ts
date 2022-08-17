@@ -16,6 +16,7 @@ export interface RubocopOffense {
   message: string;
   cop_name: string;
   corrected: boolean;
+  correctable: boolean;
   location: RubocopLocation;
 }
 

@@ -1,5 +1,5 @@
 import * as vscode from 'vscode';
-import { Rubocop, RubocopAutocorrectProvider } from './rubocop';
+import { Rubocop } from './rubocop';
 import { onDidChangeConfiguration } from './configuration';
 
 // entry point of extension
@@ -29,6 +29,10 @@ export function activate(context: vscode.ExtensionContext): void {
     rubocop.execute(e);
   });
 
+  ws.onWillSaveTextDocument(() => {
+    rubocop.executeAutocorrectOnSave();
+  });
+
   ws.onDidSaveTextDocument((e: vscode.TextDocument) => {
     if (rubocop.isOnSave) {
       rubocop.execute(e);
@@ -38,30 +42,22 @@ export function activate(context: vscode.ExtensionContext): void {
   ws.onDidCloseTextDocument((e: vscode.TextDocument) => {
     rubocop.clear(e);
   });
-  const formattingProvider = new RubocopAutocorrectProvider();
+
   vscode.languages.registerDocumentFormattingEditProvider(
     'ruby',
-    formattingProvider
+    rubocop.formattingProvider
   );
   vscode.languages.registerDocumentFormattingEditProvider(
     'gemfile',
-    formattingProvider
+    rubocop.formattingProvider
   );
 
-const autocorrectDisposable = vscode.commands.registerCommand('ruby.rubocop.autocorrect', () => {
-  vscode.window.activeTextEditor.edit((editBuilder) => {
-    const document = vscode.window.activeTextEditor.document;
-    const edits = formattingProvider.provideDocumentFormattingEdits(document);
-    // We only expect one edit from our formatting provider.
-    if (edits.length === 1) {
-      const edit = edits[0];
-      editBuilder.replace(edit.range, edit.newText);
+  const autocorrectDisposable = vscode.commands.registerCommand(
+    'ruby.rubocop.autocorrect',
+    () => {
+      return rubocop.executeAutocorrect();
     }
-    if (edits.length > 1) {
-      throw new Error("Unexpected error: Rubocop document formatter returned multiple edits.");
-    }
-  });
-});
+  );
 
-context.subscriptions.push(autocorrectDisposable);
+  context.subscriptions.push(autocorrectDisposable);
 }

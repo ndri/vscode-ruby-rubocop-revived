@@ -7,6 +7,7 @@ import { Rubocop } from './rubocop';
 export interface RubocopConfig {
   command: string;
   onSave: boolean;
+  autocorrectOnSave: boolean;
   configFilePath: string;
   useBundler: boolean;
   useServer: boolean;
@@ -53,7 +54,6 @@ export const getConfig: () => RubocopConfig = () => {
   const configPath = conf.get('executePath', '');
   const suppressRubocopWarnings = conf.get('suppressRubocopWarnings', false);
   let command: string;
-  console.debug('Using Rubocop server: ' + useServer);
 
   // if executePath is present in workspace config, use it.
   if (configPath.length !== 0) {
@@ -75,6 +75,7 @@ export const getConfig: () => RubocopConfig = () => {
     command,
     configFilePath: conf.get('configFilePath', ''),
     onSave: conf.get('onSave', true),
+    autocorrectOnSave: conf.get('autocorrectOnSave', false),
     useBundler,
     useServer,
     suppressRubocopWarnings,

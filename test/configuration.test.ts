@@ -19,6 +19,7 @@ vsStub.workspace.getConfiguration = (
     configfilePath: '',
     executePath: '',
     onSave: true,
+    autocorrectOnSave: false,
     useBundler: false,
     suppressRubocopWarnings: false,
   };
@@ -56,6 +57,16 @@ describe('RubocopConfig', () => {
       it('is unset if a bundled rubocop is not found', () => {
         childProcessStub.execSync = cannotFindBundledCop;
         expect(getConfig()).to.have.property('useBundler', false);
+      });
+    });
+
+    describe('.autocorrectOnSave', () => {
+      it('is set', () => {
+        expect(getConfig()).to.have.property('autocorrectOnSave');
+      });
+
+      it('is set to false by default', () => {
+        expect(getConfig()).to.have.property('autocorrectOnSave', false);
       });
     });
 
