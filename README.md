@@ -3,6 +3,8 @@
 # Rubocop for Visual Studio Code - revived
 It seems the original extension at is no longer being maintained. Let's pick it up from here.
 
+Don't forget to give the extension a review in the marketplace.
+
 Marketplace: [https://marketplace.visualstudio.com/items?itemName=LoranKloeze.ruby-rubocop-revived](https://marketplace.visualstudio.com/items?itemName=LoranKloeze.ruby-rubocop-revived)
 
 # Docs from original repo
