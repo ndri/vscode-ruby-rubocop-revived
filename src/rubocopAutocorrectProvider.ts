@@ -7,12 +7,15 @@ import { getCommandArguments, getCurrentPath } from './helper';
 export default class RubocopAutocorrectProvider
   implements vscode.DocumentFormattingEditProvider
 {
-  public provideDocumentFormattingEdits(
-    document: vscode.TextDocument
-  ): vscode.TextEdit[] {
+  public provideDocumentFormattingEdits(document: vscode.TextDocument): vscode.TextEdit[] {
+    return this.getAutocorrectEdits(document);
+  }
+
+  public getAutocorrectEdits(document: vscode.TextDocument, additionalArguments: string[] = []): vscode.TextEdit[] {
     const config = getConfig();
     try {
-      const args = [...getCommandArguments(document.fileName), '--autocorrect'];
+      const args = [...getCommandArguments(document.fileName), ...additionalArguments];
+      if(additionalArguments.length === 0) args.push('--autocorrect');
 
       if (config.useServer) {
         args.push('--server');

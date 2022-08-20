@@ -1,5 +1,7 @@
 import * as cp from 'child_process';
 import * as vscode from 'vscode';
+import * as fs from 'fs';
+import * as path from 'path';
 import { ExecFileException } from 'child_process';
 
 import { RubocopOutput, RubocopFile, RubocopOffense } from './rubocopOutput';
@@ -7,10 +9,12 @@ import { TaskQueue, Task } from './taskQueue';
 import { getConfig, RubocopConfig } from './configuration';
 import RubocopAutocorrectProvider from './rubocopAutocorrectProvider';
 import { getCommandArguments, isFileUri, getCurrentPath } from './helper';
+import RubocopQuickFixProvider from './rubocopQuickFixProvider';
 
 export class Rubocop {
   public config: RubocopConfig;
   public formattingProvider: RubocopAutocorrectProvider;
+  public quickFixProvider: RubocopQuickFixProvider;
   private diag: vscode.DiagnosticCollection;
   private additionalArguments: string[];
   private taskQueue: TaskQueue = new TaskQueue();
@@ -23,6 +27,19 @@ export class Rubocop {
     this.additionalArguments = additionalArguments;
     this.config = getConfig();
     this.formattingProvider = new RubocopAutocorrectProvider();
+    this.quickFixProvider = new RubocopQuickFixProvider(this.diag);
+  }
+
+  public disableCop(workspaceFolder: vscode.WorkspaceFolder, copName: string, onComplete?: () => void): void {
+    const disableCopContent = `
+${copName}:
+  Enabled: false
+`;
+
+    const rubocopYamlPath = path.join(workspaceFolder.uri.fsPath, '.rubocop.yml')
+    fs.appendFile(rubocopYamlPath, disableCopContent, () => {
+      if(onComplete) onComplete();
+    });
   }
 
   public executeAutocorrectOnSave(): boolean {
@@ -34,11 +51,11 @@ export class Rubocop {
     return this.executeAutocorrect();
   }
 
-  public executeAutocorrect(): boolean {
-    vscode.window.activeTextEditor?.edit((editBuilder) => {
+  public executeAutocorrect(additionalArguments: string[] = [], onComplete?: () => void): boolean {
+    const promise = vscode.window.activeTextEditor?.edit((editBuilder) => {
       const document = vscode.window.activeTextEditor.document;
       const edits =
-        this.formattingProvider.provideDocumentFormattingEdits(document);
+        this.formattingProvider.getAutocorrectEdits(document, additionalArguments);
       // We only expect one edit from our formatting provider.
       if (edits.length === 1) {
         const edit = edits[0];
@@ -50,6 +67,8 @@ export class Rubocop {
         );
       }
     });
+
+    if(onComplete) promise.then(() => onComplete());
 
     return true;
   }
@@ -93,8 +112,10 @@ export class Rubocop {
             loc.length + loc.column - 1
           );
           const sev = this.severity(offence.severity);
-          const message = `${offence.message} (${offence.severity}:${offence.cop_name})`;
+          const correctableString = offence.correctable ? '[Correctable]' : ''
+          const message = offence.message;
           const diagnostic = new vscode.Diagnostic(range, message, sev);
+          diagnostic.source = `${correctableString}(${offence.severity}:${offence.cop_name})`
           diagnostics.push(diagnostic);
         });
         entries.push([uri, diagnostics]);
