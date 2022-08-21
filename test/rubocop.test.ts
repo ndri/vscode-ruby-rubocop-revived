@@ -3,7 +3,7 @@ import * as vscode from 'vscode';
 import * as fs from 'fs';
 
 import * as helper from './helper';
-import { fileWithWarnings } from './fixtures';
+import * as fixtures from './fixtures';
 import { Rubocop } from '../src/rubocop';
 
 describe('Rubocop', () => {
@@ -24,13 +24,13 @@ describe('Rubocop', () => {
   });
 
   describe('autocorrectOnSave', () => {
-    it('does not work when config option is disabled', async function () {
+    it('does not work on Ruby files when config option is disabled', async function () {
       this.timeout(5000);
       await helper.closeAllEditors();
 
       const filePath = helper.createTempFile(
         'file_with_warnings.rb',
-        fileWithWarnings
+        fixtures.rubyFileWithWarnings
       );
       const editor = await helper.openFile(filePath);
       expect(instance.executeAutocorrectOnSave()).to.be.equal(false);
@@ -39,12 +39,38 @@ describe('Rubocop', () => {
       const fileAfterAutocorrect = editor.document?.getText();
 
       // Assert that there have been no changes
-      expect(fileAfterAutocorrect).to.be.equal(fileWithWarnings);
+      expect(fileAfterAutocorrect).to.be.equal(fixtures.rubyFileWithWarnings);
 
       fs.unlinkSync(filePath);
     });
 
-    it('works when config option is enabled', async function () {
+    it('does not work on non-Ruby files when config option is enabled', async function () {
+      this.timeout(5000);
+      await helper.closeAllEditors();
+
+      instance.config = {
+        ...instance.config,
+        onSave: true,
+        autocorrectOnSave: true,
+      };
+
+      const filePath = helper.createTempFile(
+        'test_file.js',
+        fixtures.jsFile
+      );
+      const editor = await helper.openFile(filePath);
+      expect(instance.executeAutocorrectOnSave()).to.be.equal(false);
+
+      await helper.sleep(500);
+      const fileAfterAutocorrect = editor.document?.getText();
+
+      // Assert that there have been no changes
+      expect(fileAfterAutocorrect).to.be.equal(fixtures.jsFile);
+
+      fs.unlinkSync(filePath);
+    });
+
+    it('works on Ruby files when config option is enabled', async function () {
       this.timeout(5000);
       await helper.closeAllEditors();
 
@@ -56,7 +82,7 @@ describe('Rubocop', () => {
 
       const filePath = helper.createTempFile(
         'file_with_warnings.rb',
-        fileWithWarnings
+        fixtures.rubyFileWithWarnings
       );
       const editor = await helper.openFile(filePath);
       expect(instance.executeAutocorrectOnSave()).to.be.equal(true);
@@ -65,7 +91,7 @@ describe('Rubocop', () => {
       const fileAfterAutocorrect = editor.document?.getText();
 
       // Assert that there have been changes
-      expect(fileAfterAutocorrect).not.to.be.equal(fileWithWarnings);
+      expect(fileAfterAutocorrect).not.to.be.equal(fixtures.rubyFileWithWarnings);
 
       fs.unlinkSync(filePath);
     });

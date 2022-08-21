@@ -134,6 +134,9 @@ export class Rubocop {
   }
 
   public executeAutocorrectOnSave(): boolean {
+    const document = vscode.window.activeTextEditor?.document;
+    if (document === null || document === undefined) return false;
+    if ((document.languageId !== 'gemfile' && document.languageId !== 'ruby') || document.isUntitled || !isFileUri(document.uri)) return false;
     if (!this.isOnSave || !this.autocorrectOnSave) return false;
 
     return this.executeAutocorrect();
