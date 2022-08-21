@@ -240,5 +240,103 @@ describe('RubocopQuickFixProvider', () => {
         expect(quickFixes[5].command.arguments).to.be.equal(undefined);
       });
     });
+
+    it('ignores another cop in the same line', async function() {
+      let range: vscode.Range;
+
+      this.timeout(5000);
+      await helper.closeAllEditors();
+
+      const filePath = helper.createTempFile(
+        'file_with_disabled_cop_for_line.rb',
+        fixtures.rubyFileWithDisabledCopForLine
+      );
+      const editor = await helper.openFile(filePath);
+
+      await helper.sleep(500);
+
+      range = new vscode.Range(new vscode.Position(1, 13), new vscode.Position(1, 15));
+      const diagnostic = new vscode.Diagnostic(
+        range,
+        'Use `&&` instead of `and`.',
+        vscode.DiagnosticSeverity.Warning
+      );
+      diagnostic.source = '[Correctable](convention:Style/AndOr)';
+      diagnostics.set(editor.document.uri, [diagnostic]);
+
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      //@ts-ignore
+      const quickFixes: vscode.CodeAction[] = instance.provideCodeActions(editor.document, range);
+
+      expect(quickFixes).to.be.instanceOf(Array);
+      expect(quickFixes.length).to.be.equal(6);
+
+      expect(quickFixes[1].title).to.contain('Ignore `Style/AndOr` for this line');
+
+      expect(quickFixes[1].command.command).to.be.equal('ruby.rubocop');
+      expect(quickFixes[1].command.title).to.be.equal('Lint the file with Rubocop');
+      expect(quickFixes[1].command.arguments).to.be.equal(undefined);
+
+      expect(quickFixes[1].edit).to.be.instanceOf(vscode.WorkspaceEdit);
+      const fileEdits = quickFixes[1].edit.get(editor.document.uri);
+      expect(fileEdits.length).to.be.equal(1);
+
+      expect(fileEdits[0].newText).to.be.equal('if something and other and 4 # rubocop:disable Style/IfUnlessModifier, Style/AndOr');
+      range = new vscode.Range(new vscode.Position(1, 0), new vscode.Position(1, 82));
+      expect(JSON.stringify(fileEdits[0].range)).to.be.equal(JSON.stringify(range));
+
+      fs.unlinkSync(filePath);
+    });
+
+    it('disables another cop for file in the same line', async function() {
+      let range: vscode.Range;
+
+      this.timeout(5000);
+      await helper.closeAllEditors();
+
+      const filePath = helper.createTempFile(
+        'file_with_disabled_cop_for_line.rb',
+        fixtures.rubyFileWithDisabledCopForFile
+      );
+      const editor = await helper.openFile(filePath);
+
+      await helper.sleep(500);
+
+      range = new vscode.Range(new vscode.Position(1, 13), new vscode.Position(1, 15));
+      const diagnostic = new vscode.Diagnostic(
+        range,
+        'Use `&&` instead of `and`.',
+        vscode.DiagnosticSeverity.Warning
+      );
+      diagnostic.source = '[Correctable](convention:Style/AndOr)';
+      diagnostics.set(editor.document.uri, [diagnostic]);
+
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      //@ts-ignore
+      const quickFixes: vscode.CodeAction[] = instance.provideCodeActions(editor.document, range);
+
+      expect(quickFixes).to.be.instanceOf(Array);
+      expect(quickFixes.length).to.be.equal(6);
+
+      expect(quickFixes[2].title).to.contain('Disable `Style/AndOr` for this file');
+
+      expect(quickFixes[2].command.command).to.be.equal('ruby.rubocop');
+      expect(quickFixes[2].command.title).to.be.equal('Lint the file with Rubocop');
+      expect(quickFixes[2].command.arguments).to.be.equal(undefined);
+
+      expect(quickFixes[2].edit).to.be.instanceOf(vscode.WorkspaceEdit);
+      const fileEdits = quickFixes[2].edit.get(editor.document.uri);
+      expect(fileEdits.length).to.be.equal(2);
+
+      expect(fileEdits[0].newText).to.be.equal('# rubocop:disable Style/IfUnlessModifier, Style/AndOr');
+      range = new vscode.Range(new vscode.Position(0, 0), new vscode.Position(0, 40));
+      expect(JSON.stringify(fileEdits[0].range)).to.be.equal(JSON.stringify(range));
+
+      expect(fileEdits[1].newText).to.be.equal('# rubocop:enable Style/IfUnlessModifier, Style/AndOr');
+      range = new vscode.Range(new vscode.Position(4, 0), new vscode.Position(4, 39));
+      expect(JSON.stringify(fileEdits[1].range)).to.be.equal(JSON.stringify(range));
+
+      fs.unlinkSync(filePath);
+    });
   });
 });
