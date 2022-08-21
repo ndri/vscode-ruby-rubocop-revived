@@ -29,7 +29,7 @@ When autoCorrect is enabled, the history of changing file is broken.
 ## Features
 
 - lint by executing the command "Ruby: lint by rubocop" (cmd+shift+p and type command)
-- auto invoke when saving file
+- auto correct when saving a file
 - auto correct command "Ruby: autocorrect by rubocop"
 
 ### Exclude file
@@ -78,6 +78,9 @@ Specify configuration (via navigating to `File > Preferences > Workspace Setting
 
   // default true
   "ruby.rubocop.onSave": true
+  
+  // use the --server option when running Rubocop - default false
+  "ruby.rubocop.useServer": true
 }
 ```
 
