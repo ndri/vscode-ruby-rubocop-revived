@@ -50,8 +50,9 @@ export default class RubocopQuickFixProvider
   }
 
   private createQuickFixes(document: vscode.TextDocument, diagnostic: vscode.Diagnostic): vscode.CodeAction[] {
-    const quickFixes = []
+    const quickFixes = [];
     const copName = this.extractCopName(diagnostic);
+    if(copName === null) return quickFixes;
 
     const autocorrectQuickFix = this.autocorrectCopInFile(copName, diagnostic);
     if(autocorrectQuickFix !== null) quickFixes.push(autocorrectQuickFix);
@@ -108,7 +109,8 @@ export default class RubocopQuickFixProvider
   }
 
   private autocorrectCopInFile(copName: string, diagnostic: vscode.Diagnostic): vscode.CodeAction | null {
-    if(diagnostic.source?.match(correctableDiagnosticRegexp) === null) return null;
+    const correctableMatch = diagnostic.source?.match(correctableDiagnosticRegexp);
+    if(correctableMatch === null || correctableMatch === undefined) return null;
 
     const quickFix = new vscode.CodeAction(`Fix \`${copName}\` in this file`, vscode.CodeActionKind.QuickFix);
     quickFix.command = {
@@ -122,13 +124,13 @@ export default class RubocopQuickFixProvider
   }
 
   private disableCopInRubocopYaml(document: vscode.TextDocument, copName: string, diagnostic: vscode.Diagnostic): vscode.CodeAction | null {
-    if(vscode.workspace.workspaceFolders === undefined) return null;
+    if(vscode.workspace.workspaceFolders === undefined || vscode.workspace.workspaceFolders === null) return null;
 
     const currentWorkspaceFolder = vscode.workspace.workspaceFolders.find((workspaceFolder) => {
       return document.uri.path.includes(workspaceFolder.uri.path);
     })
 
-    if(currentWorkspaceFolder === undefined) return null;
+    if(currentWorkspaceFolder === undefined || currentWorkspaceFolder === null) return null;
 
     const quickFix = new vscode.CodeAction(`Disable \`${copName}\` for this project`, vscode.CodeActionKind.QuickFix);
     quickFix.diagnostics = [diagnostic];
@@ -150,14 +152,14 @@ export default class RubocopQuickFixProvider
     const lastLine = document.lineAt(lineCount - 2);
 
     const rubocopDisableMatch = firstLine.text.match(rubocopDisableRegexp);
-    if(rubocopDisableMatch !== null) {
+    if(rubocopDisableMatch !== undefined && rubocopDisableMatch !== null) {
       edit.replace(document.uri, firstLine.range, `${rubocopDisableMatch[0]}, ${copName}`);
     } else {
       edit.insert(document.uri, new vscode.Position(0, 0), `# rubocop:disable ${copName}\n`);
     }
 
     const rubocopEnableMatch = lastLine.text.match(rubocopEnableRegexp);
-    if(rubocopEnableMatch !== null) {
+    if(rubocopEnableMatch !== undefined && rubocopEnableMatch !== null) {
       edit.replace(document.uri, lastLine.range, `${rubocopEnableMatch[0]}, ${copName}`);
     } else {
       edit.insert(document.uri, new vscode.Position(lineCount, 0), `\n# rubocop:enable ${copName}\n`);
@@ -180,17 +182,17 @@ export default class RubocopQuickFixProvider
 
     const initialWhitespace = lineText.match(initialWhitespaceRegexp) || '';
     const existingCommentMatch = lineText.match(rubyCommentRegexp);
-    if(existingCommentMatch === null) return null;
+    if(existingCommentMatch === null || existingCommentMatch === undefined) return null;
 
     const existingCommentText = existingCommentMatch[5];
     const codeWithoutComment = `${initialWhitespace}${existingCommentMatch[1]}`;
     if(codeWithoutComment.length === 0) return null;
 
-    if(existingCommentText !== undefined) {
+    if(existingCommentText !== undefined && existingCommentText !== null) {
       newCommentStartCharacter = 0
       const rubocopDisableMatch = existingCommentText.match(rubocopDisableRegexp);
 
-      if(rubocopDisableMatch !== null) {
+      if(rubocopDisableMatch !== undefined && rubocopDisableMatch !== null) {
         newCommentText = `${codeWithoutComment}${rubocopDisableMatch[0]}, ${copName}`;
       } else {
         newCommentText = `${codeWithoutComment}${newCommentText.substring(1)}`;
@@ -213,7 +215,7 @@ export default class RubocopQuickFixProvider
 
   private extractCopName(diagnostic: vscode.Diagnostic): string | null {
     const matches = diagnostic.source?.match(copFromDiagnosticSourceRegexp);
-    if(matches === null) return null;
+    if(matches === null || matches === undefined) return null;
 
     return matches[1];
   }

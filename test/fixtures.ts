@@ -13,18 +13,23 @@ if something and other and 4
   return nil
 end
 
-{
-      car: 3, # some comment
+{ # some comment
+      car: 3,
     boot: 56, bonnet: 10
 }
+`;
 
-def someMethod(    arg )
-  if arg
-    return arg
-  end
+export const rubyFileWithDisabledCopForLine = `
+if something and other and 4 # rubocop:disable Style/IfUnlessModifier
+  return nil
+end
+`;
 
-  return :default
-  end                    
+export const rubyFileWithDisabledCopForFile = `# rubocop:disable Style/IfUnlessModifier
+if something and other and 4
+  return nil
+end
+# rubocop:enable Style/IfUnlessModifier
 `;
 
 export const jsFile = `
