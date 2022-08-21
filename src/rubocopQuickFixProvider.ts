@@ -1,14 +1,16 @@
 import * as vscode from 'vscode';
 
 const initialWhitespaceRegexp = /^\s+/
-const correctableRegexp = /\[Correctable\]\([a-z]+:((\w|\/)+)\)$/;
+const correctableDiagnosticRegexp = /^\[Correctable\]/;
 // Group 1 is the name of the cop
-const copFromMessageRegexp = /\([a-z]+:((\w|\/)+)\)$/;
+const copFromDiagnosticSourceRegexp = /\([a-z]+:((\w|\/)+)\)$/;
 // Group 1 is the code without the comment
 // Group 5 is the comment
 const rubyCommentRegexp = /^[\t ]*([^#"'\r\n]("(\\"|[^"])*"|'(\\'|[^'])*'|[^#\n\r])*)(#([^#\r\n]*))?/
 // Group 2 is the list of cop names
-const rubocopDisableRegexp = /(# )?rubocop:disable (((\w|\/)+)(,\s+((\w|\/)+))*)/
+const rubocopDisableRegexp = /# rubocop:disable (((\w|\/)+)(,\s+((\w|\/)+))*)/
+// Group 2 is the list of cop names
+const rubocopEnableRegexp = /# rubocop:enable (((\w|\/)+)(,\s+((\w|\/)+))*)/
 
 export default class RubocopQuickFixProvider
   implements vscode.CodeActionProvider
@@ -35,6 +37,15 @@ export default class RubocopQuickFixProvider
       quickFixes = quickFixes.concat(this.createQuickFixes(document, diagnostic));
     })
 
+    const anyDiagnosticAutocorrectable = -1 !== appliedDiagnostics.findIndex((diagnostic) => {
+      return diagnostic.source?.match(correctableDiagnosticRegexp) !== null
+    })
+
+    if(anyDiagnosticAutocorrectable) {
+      quickFixes.push(this.forceFixingAll());
+      quickFixes.push(this.fixAllSafely());
+    }
+
     return quickFixes;
   }
 
@@ -45,21 +56,20 @@ export default class RubocopQuickFixProvider
     const autocorrectQuickFix = this.autocorrectCopInFile(copName, diagnostic);
     if(autocorrectQuickFix !== null) quickFixes.push(autocorrectQuickFix);
 
-    quickFixes.push(this.ignoreCopForLineQuickFix(document, copName, diagnostic));
+    const ignoreCopForLineQuickFix = this.ignoreCopForLineQuickFix(document, copName, diagnostic);
+    if(ignoreCopForLineQuickFix !== null) quickFixes.push(ignoreCopForLineQuickFix);
+
+    quickFixes.push(this.disableCopForFileQuickFix(document, copName, diagnostic));
 
     const disableCopInRubocopYaml = this.disableCopInRubocopYaml(document, copName, diagnostic);
     if(disableCopInRubocopYaml !== null) quickFixes.push(disableCopInRubocopYaml);
 
     quickFixes.push(this.showCopDocumentation(copName, diagnostic));
-    quickFixes.push(this.forceFixingAll(diagnostic));
-    quickFixes.push(this.fixAllSafely(diagnostic));
 
     return quickFixes;
   }
 
-  private forceFixingAll(diagnostic: vscode.Diagnostic): vscode.CodeAction {
-    if(diagnostic.source?.match(correctableRegexp) === null) return null;
-
+  private forceFixingAll(): vscode.CodeAction {
     const quickFix = new vscode.CodeAction('Force fixing all warnings', vscode.CodeActionKind.QuickFix);
     quickFix.command = {
       command: 'ruby.rubocop.autocorrect',
@@ -70,9 +80,7 @@ export default class RubocopQuickFixProvider
     return quickFix;
   }
 
-  private fixAllSafely(diagnostic: vscode.Diagnostic): vscode.CodeAction {
-    if(diagnostic.source?.match(correctableRegexp) === null) return null;
-
+  private fixAllSafely(): vscode.CodeAction {
     const quickFix = new vscode.CodeAction(`Fix all warnings safely`, vscode.CodeActionKind.QuickFix);
     quickFix.command = {
       command: 'ruby.rubocop.autocorrect',
@@ -100,7 +108,7 @@ export default class RubocopQuickFixProvider
   }
 
   private autocorrectCopInFile(copName: string, diagnostic: vscode.Diagnostic): vscode.CodeAction | null {
-    if(diagnostic.source?.match(correctableRegexp) === null) return null;
+    if(diagnostic.source?.match(correctableDiagnosticRegexp) === null) return null;
 
     const quickFix = new vscode.CodeAction(`Fix \`${copName}\` in this file`, vscode.CodeActionKind.QuickFix);
     quickFix.command = {
@@ -133,7 +141,36 @@ export default class RubocopQuickFixProvider
     return quickFix;
   }
 
-  private ignoreCopForLineQuickFix(document: vscode.TextDocument, copName: string, diagnostic: vscode.Diagnostic): vscode.CodeAction {
+  private disableCopForFileQuickFix(document: vscode.TextDocument, copName: string, diagnostic: vscode.Diagnostic): vscode.CodeAction {
+    const quickFix = new vscode.CodeAction(`Disable \`${copName}\` for this file`, vscode.CodeActionKind.QuickFix);
+
+    const edit = new vscode.WorkspaceEdit();
+    const lineCount = document.lineCount;
+    const firstLine = document.lineAt(0);
+    const lastLine = document.lineAt(lineCount - 2);
+
+    const rubocopDisableMatch = firstLine.text.match(rubocopDisableRegexp);
+    if(rubocopDisableMatch !== null) {
+      edit.replace(document.uri, firstLine.range, `${rubocopDisableMatch[0]}, ${copName}`);
+    } else {
+      edit.insert(document.uri, new vscode.Position(0, 0), `# rubocop:disable ${copName}\n`);
+    }
+
+    const rubocopEnableMatch = lastLine.text.match(rubocopEnableRegexp);
+    if(rubocopEnableMatch !== null) {
+      edit.replace(document.uri, lastLine.range, `${rubocopEnableMatch[0]}, ${copName}`);
+    } else {
+      edit.insert(document.uri, new vscode.Position(lineCount, 0), `\n# rubocop:enable ${copName}\n`);
+    }
+
+    quickFix.edit = edit;
+    quickFix.command = { command: 'ruby.rubocop', title: 'Lint the file with Rubocop' };
+    quickFix.diagnostics = [diagnostic]
+
+    return quickFix;
+  }
+
+  private ignoreCopForLineQuickFix(document: vscode.TextDocument, copName: string, diagnostic: vscode.Diagnostic): vscode.CodeAction | null {
     const quickFix = new vscode.CodeAction(`Ignore \`${copName}\` for this line`, vscode.CodeActionKind.QuickFix);
 
     const lineNumber = diagnostic.range.start.line;
@@ -143,8 +180,11 @@ export default class RubocopQuickFixProvider
 
     const initialWhitespace = lineText.match(initialWhitespaceRegexp) || '';
     const existingCommentMatch = lineText.match(rubyCommentRegexp);
+    if(existingCommentMatch === null) return null;
+
     const existingCommentText = existingCommentMatch[5];
     const codeWithoutComment = `${initialWhitespace}${existingCommentMatch[1]}`;
+    if(codeWithoutComment.length === 0) return null;
 
     if(existingCommentText !== undefined) {
       newCommentStartCharacter = 0
@@ -172,7 +212,7 @@ export default class RubocopQuickFixProvider
   }
 
   private extractCopName(diagnostic: vscode.Diagnostic): string | null {
-    const matches = diagnostic.source?.match(copFromMessageRegexp);
+    const matches = diagnostic.source?.match(copFromDiagnosticSourceRegexp);
     if(matches === null) return null;
 
     return matches[1];
