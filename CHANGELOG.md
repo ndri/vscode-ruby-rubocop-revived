@@ -1,3 +1,7 @@
+# 0.9.3 (not released yet)
+
+- Bugfix where even non-Ruby files were autocorrected (thanks [@Verseth](https://github.com/Verseth)) 
+
 # 0.9.2
 
 - Addded option to autocorrect a file on save (thanks [@Verseth](https://github.com/Verseth))
