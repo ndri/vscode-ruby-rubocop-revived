@@ -25,7 +25,7 @@ export default class RubocopQuickFixProvider
   // is hovered or when the cursor's position is changed.
   public provideCodeActions(document: vscode.TextDocument, range: vscode.Range | vscode.Selection): vscode.ProviderResult<vscode.CodeAction[]> {
     const fileDiagnostics = this.diag.get(document.uri);
-    if(fileDiagnostics === undefined || fileDiagnostics === null || fileDiagnostics.length == 0) return;
+    if(fileDiagnostics === undefined || fileDiagnostics === null || fileDiagnostics.length == 0) return null;
 
     const appliedDiagnostics = fileDiagnostics.filter((diagnostic) => {
       return undefined !== diagnostic.range.intersection(range)

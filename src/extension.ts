@@ -10,9 +10,9 @@ export function activate(context: vscode.ExtensionContext): void {
   context.subscriptions.push(diag);
 
   const rubocop = new Rubocop(diag);
-  const disposable = vscode.commands.registerCommand('ruby.rubocop', () => {
+  const disposable = vscode.commands.registerCommand('ruby.rubocop', (onComplete?: () => void) => {
     const document = vscode.window.activeTextEditor.document;
-    rubocop.execute(document);
+    rubocop.execute(document, onComplete);
   });
 
   context.subscriptions.push(disposable);
