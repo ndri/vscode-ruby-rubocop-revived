@@ -82,7 +82,7 @@ describe('RubocopQuickFixProvider', () => {
       });
 
       it('ignores `Lint/Void` for line', () => {
-        expect(quickFixes[0].title).to.contain('Ignore `Lint/Void` for this line');
+        expect(quickFixes[0].title).to.equal('Ignore (line) `Lint/Void`');
 
         expect(quickFixes[0].command.command).to.be.equal('ruby.rubocop');
         expect(quickFixes[0].command.title).to.be.equal('Lint the file with Rubocop');
@@ -98,7 +98,7 @@ describe('RubocopQuickFixProvider', () => {
       });
 
       it('disables `Lint/Void` for file', () => {
-        expect(quickFixes[1].title).to.contain('Disable `Lint/Void` for this file');
+        expect(quickFixes[1].title).to.be.equal('Disable (file) `Lint/Void`');
 
         expect(quickFixes[1].command.command).to.be.equal('ruby.rubocop');
         expect(quickFixes[1].command.title).to.be.equal('Lint the file with Rubocop');
@@ -168,15 +168,15 @@ describe('RubocopQuickFixProvider', () => {
       });
 
       it('fixes `Layout/FirstHashElementIndentation` in file', () => {
-        expect(quickFixes[0].title).to.contain('Fix `Layout/FirstHashElementIndentation` in this file');
+        expect(quickFixes[0].title).to.be.equal('Fix `Layout/FirstHashElementIndentation`');
         expect(quickFixes[0].edit).to.be.equal(undefined);
         expect(quickFixes[0].command.command).to.be.equal('ruby.rubocop.autocorrect');
-        expect(quickFixes[0].command.title).to.be.equal('Fix `Layout/FirstHashElementIndentation` in this file');
+        expect(quickFixes[0].command.title).to.be.equal('Fix `Layout/FirstHashElementIndentation`');
         expect(JSON.stringify(quickFixes[0].command.arguments)).to.be.equal(JSON.stringify(['-A', '--only', 'Layout/FirstHashElementIndentation']));
       });
 
       it('ignores `Layout/FirstHashElementIndentation` for line', () => {
-        expect(quickFixes[1].title).to.contain('Ignore `Layout/FirstHashElementIndentation` for this line');
+        expect(quickFixes[1].title).to.be.equal('Ignore (line) `Layout/FirstHashElementIndentation`');
 
         expect(quickFixes[1].command.command).to.be.equal('ruby.rubocop');
         expect(quickFixes[1].command.title).to.be.equal('Lint the file with Rubocop');
@@ -192,7 +192,7 @@ describe('RubocopQuickFixProvider', () => {
       });
 
       it('disables `Layout/FirstHashElementIndentation` for file', () => {
-        expect(quickFixes[2].title).to.contain('Disable `Layout/FirstHashElementIndentation` for this file');
+        expect(quickFixes[2].title).to.be.equal('Disable (file) `Layout/FirstHashElementIndentation`');
 
         expect(quickFixes[2].command.command).to.be.equal('ruby.rubocop');
         expect(quickFixes[2].command.title).to.be.equal('Lint the file with Rubocop');
@@ -222,21 +222,21 @@ describe('RubocopQuickFixProvider', () => {
       });
 
       it('forces fixing all', () => {
-        expect(quickFixes[4].title).to.contain('Force fixing all warnings')
+        expect(quickFixes[4].title).to.be.equal('Fix all warnings')
         expect(quickFixes[4].edit).to.be.equal(undefined);
 
         expect(quickFixes[4].command.command).to.be.equal('ruby.rubocop.autocorrect');
-        expect(quickFixes[4].command.title).to.be.equal('Force fixing all warnings');
+        expect(quickFixes[4].command.title).to.be.equal('Fix all warnings');
         expect(quickFixes[4].command.arguments.length).to.be.equal(1);
         expect(quickFixes[4].command.arguments[0]).to.be.equal('-A');
       });
 
       it('fixes all safely', () => {
-        expect(quickFixes[5].title).to.contain('Fix all warnings safely')
+        expect(quickFixes[5].title).to.be.equal('Fix all warnings (safely)')
         expect(quickFixes[5].edit).to.be.equal(undefined);
 
         expect(quickFixes[5].command.command).to.be.equal('ruby.rubocop.autocorrect');
-        expect(quickFixes[5].command.title).to.be.equal('Fix all warnings safely');
+        expect(quickFixes[5].command.title).to.be.equal('Fix all warnings (safely)');
         expect(quickFixes[5].command.arguments).to.be.equal(undefined);
       });
     });
@@ -271,7 +271,7 @@ describe('RubocopQuickFixProvider', () => {
       expect(quickFixes).to.be.instanceOf(Array);
       expect(quickFixes.length).to.be.equal(6);
 
-      expect(quickFixes[1].title).to.contain('Ignore `Style/AndOr` for this line');
+      expect(quickFixes[1].title).to.be.equal('Ignore (line) `Style/AndOr`');
 
       expect(quickFixes[1].command.command).to.be.equal('ruby.rubocop');
       expect(quickFixes[1].command.title).to.be.equal('Lint the file with Rubocop');
@@ -318,7 +318,7 @@ describe('RubocopQuickFixProvider', () => {
       expect(quickFixes).to.be.instanceOf(Array);
       expect(quickFixes.length).to.be.equal(6);
 
-      expect(quickFixes[2].title).to.contain('Disable `Style/AndOr` for this file');
+      expect(quickFixes[2].title).to.be.equal('Disable (file) `Style/AndOr`' );
 
       expect(quickFixes[2].command.command).to.be.equal('ruby.rubocop');
       expect(quickFixes[2].command.title).to.be.equal('Lint the file with Rubocop');

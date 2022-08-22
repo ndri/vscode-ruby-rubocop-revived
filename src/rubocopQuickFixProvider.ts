@@ -71,10 +71,10 @@ export default class RubocopQuickFixProvider
   }
 
   private forceFixingAll(): vscode.CodeAction {
-    const quickFix = new vscode.CodeAction('Force fixing all warnings', vscode.CodeActionKind.QuickFix);
+    const quickFix = new vscode.CodeAction('Fix all warnings', vscode.CodeActionKind.QuickFix);
     quickFix.command = {
       command: 'ruby.rubocop.autocorrect',
-      title: 'Force fixing all warnings',
+      title: 'Fix all warnings',
       arguments: ['-A']
     };
 
@@ -82,10 +82,10 @@ export default class RubocopQuickFixProvider
   }
 
   private fixAllSafely(): vscode.CodeAction {
-    const quickFix = new vscode.CodeAction(`Fix all warnings safely`, vscode.CodeActionKind.QuickFix);
+    const quickFix = new vscode.CodeAction(`Fix all warnings (safely)`, vscode.CodeActionKind.QuickFix);
     quickFix.command = {
       command: 'ruby.rubocop.autocorrect',
-      title: `Fix all warnings safely`
+      title: `Fix all warnings (safely)`
     };
 
     return quickFix;
@@ -112,10 +112,10 @@ export default class RubocopQuickFixProvider
     const correctableMatch = diagnostic.source?.match(correctableDiagnosticRegexp);
     if(correctableMatch === null || correctableMatch === undefined) return null;
 
-    const quickFix = new vscode.CodeAction(`Fix \`${copName}\` in this file`, vscode.CodeActionKind.QuickFix);
+    const quickFix = new vscode.CodeAction(`Fix \`${copName}\``, vscode.CodeActionKind.QuickFix);
     quickFix.command = {
       command: 'ruby.rubocop.autocorrect',
-      title: `Fix \`${copName}\` in this file`,
+      title: `Fix \`${copName}\``,
       arguments: ['-A', '--only', copName]
     };
     quickFix.diagnostics = [diagnostic];
@@ -132,11 +132,11 @@ export default class RubocopQuickFixProvider
 
     if(currentWorkspaceFolder === undefined || currentWorkspaceFolder === null) return null;
 
-    const quickFix = new vscode.CodeAction(`Disable \`${copName}\` for this project`, vscode.CodeActionKind.QuickFix);
+    const quickFix = new vscode.CodeAction(`Disable (project) \`${copName}\``, vscode.CodeActionKind.QuickFix);
     quickFix.diagnostics = [diagnostic];
     quickFix.command = {
       command: 'ruby.rubocop.disableCop',
-      title: `Disable \`${copName}\` in \`.rubocop.yml\``,
+      title: `Disable (project) \`${copName}\` in \`.rubocop.yml\``,
       arguments: [currentWorkspaceFolder, copName]
     };
 
@@ -144,7 +144,7 @@ export default class RubocopQuickFixProvider
   }
 
   private disableCopForFileQuickFix(document: vscode.TextDocument, copName: string, diagnostic: vscode.Diagnostic): vscode.CodeAction {
-    const quickFix = new vscode.CodeAction(`Disable \`${copName}\` for this file`, vscode.CodeActionKind.QuickFix);
+    const quickFix = new vscode.CodeAction(`Disable (file) \`${copName}\``, vscode.CodeActionKind.QuickFix);
 
     const edit = new vscode.WorkspaceEdit();
     const lineCount = document.lineCount;
@@ -173,7 +173,7 @@ export default class RubocopQuickFixProvider
   }
 
   private ignoreCopForLineQuickFix(document: vscode.TextDocument, copName: string, diagnostic: vscode.Diagnostic): vscode.CodeAction | null {
-    const quickFix = new vscode.CodeAction(`Ignore \`${copName}\` for this line`, vscode.CodeActionKind.QuickFix);
+    const quickFix = new vscode.CodeAction(`Ignore (line) \`${copName}\``, vscode.CodeActionKind.QuickFix);
 
     const lineNumber = diagnostic.range.start.line;
     const lineText = document.lineAt(lineNumber).text;
