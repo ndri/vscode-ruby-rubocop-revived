@@ -1,4 +1,4 @@
-# 0.9.3 (not released yet)
+# 0.9.3
 
 - Bugfix where even non-Ruby files were autocorrected (thanks [@Verseth](https://github.com/Verseth)) 
 
