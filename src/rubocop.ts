@@ -1,124 +1,20 @@
-import { RubocopOutput, RubocopFile, RubocopOffense } from './rubocopOutput';
-import { TaskQueue, Task } from './taskQueue';
 import * as cp from 'child_process';
+import * as vscode from 'vscode';
 import * as fs from 'fs';
 import * as path from 'path';
-import * as vscode from 'vscode';
-import { getConfig, RubocopConfig } from './configuration';
 import { ExecFileException } from 'child_process';
 
-export class RubocopAutocorrectProvider
-  implements vscode.DocumentFormattingEditProvider
-{
-  public provideDocumentFormattingEdits(
-    document: vscode.TextDocument
-  ): vscode.TextEdit[] {
-    const config = getConfig();
-    try {
-      const args = [...getCommandArguments(document.fileName), '--autocorrect'];
-
-      if (config.useServer) {
-        args.push('--server');
-      }
-
-      const options = {
-        cwd: getCurrentPath(document.uri),
-        input: document.getText(),
-      };
-      let stdout;
-      if (config.useBundler) {
-        stdout = cp.execSync(`${config.command} ${args.join(' ')}`, options);
-      } else {
-        stdout = cp.execFileSync(config.command, args, options);
-      }
-
-      return this.onSuccess(document, stdout);
-    } catch (e) {
-      // if there are still some offences not fixed RuboCop will return status 1
-      if (e.status !== 1) {
-        vscode.window.showWarningMessage(
-          'An error occurred during auto-correction'
-        );
-        console.log(e);
-        return [];
-      } else {
-        return this.onSuccess(document, e.stdout);
-      }
-    }
-  }
-
-  // Output of auto-correction looks like this:
-  //
-  // {"metadata": ... {"offense_count":5,"target_file_count":1,"inspected_file_count":1}}====================
-  // def a
-  //   3
-  // end
-  //
-  // So we need to parse out the actual auto-corrected ruby
-  private onSuccess(document: vscode.TextDocument, stdout: Buffer) {
-    const stringOut = stdout.toString();
-    const autoCorrection = stringOut.match(
-      /^.*\n====================(?:\n|\r\n)([.\s\S]*)/m
-    );
-    if (!autoCorrection) {
-      throw new Error(`Error parsing auto-correction from CLI: ${stringOut}`);
-    }
-    return [
-      new vscode.TextEdit(this.getFullRange(document), autoCorrection.pop()),
-    ];
-  }
-
-  private getFullRange(document: vscode.TextDocument): vscode.Range {
-    return new vscode.Range(
-      new vscode.Position(0, 0),
-      document.lineAt(document.lineCount - 1).range.end
-    );
-  }
-}
-
-function isFileUri(uri: vscode.Uri): boolean {
-  return uri.scheme === 'file';
-}
-
-function getCurrentPath(fileUri: vscode.Uri): string {
-  const wsfolder = vscode.workspace.getWorkspaceFolder(fileUri);
-  return (wsfolder && wsfolder.uri.fsPath) || path.dirname(fileUri.fsPath);
-}
-
-// extract argument to an array
-function getCommandArguments(fileName: string): string[] {
-  let commandArguments = ['--stdin', fileName, '--force-exclusion'];
-  const extensionConfig = getConfig();
-  if (extensionConfig.configFilePath !== '') {
-    const found = [extensionConfig.configFilePath]
-      .concat(
-        (vscode.workspace.workspaceFolders || []).map((ws) =>
-          path.join(ws.uri.path, extensionConfig.configFilePath)
-        )
-      )
-      .filter((p: string) => fs.existsSync(p));
-
-    if (found.length == 0) {
-      vscode.window.showWarningMessage(
-        `${extensionConfig.configFilePath} file does not exist. Ignoring...`
-      );
-    } else {
-      if (found.length > 1) {
-        vscode.window.showWarningMessage(
-          `Found multiple files (${found}) will use ${found[0]}`
-        );
-      }
-      const config = ['--config', found[0]];
-      commandArguments = commandArguments.concat(config);
-    }
-  }
-
-  return commandArguments;
-}
+import { RubocopOutput, RubocopFile, RubocopOffense } from './rubocopOutput';
+import { TaskQueue, Task } from './taskQueue';
+import { getConfig, RubocopConfig } from './configuration';
+import RubocopAutocorrectProvider from './rubocopAutocorrectProvider';
+import { getCommandArguments, isFileUri, getCurrentPath } from './helper';
+import RubocopQuickFixProvider from './rubocopQuickFixProvider';
 
 export class Rubocop {
   public config: RubocopConfig;
   public formattingProvider: RubocopAutocorrectProvider;
+  public quickFixProvider: RubocopQuickFixProvider;
   private diag: vscode.DiagnosticCollection;
   private additionalArguments: string[];
   private taskQueue: TaskQueue = new TaskQueue();
@@ -131,6 +27,19 @@ export class Rubocop {
     this.additionalArguments = additionalArguments;
     this.config = getConfig();
     this.formattingProvider = new RubocopAutocorrectProvider();
+    this.quickFixProvider = new RubocopQuickFixProvider(this.diag);
+  }
+
+  public disableCop(workspaceFolder: vscode.WorkspaceFolder, copName: string, onComplete?: () => void): void {
+    const disableCopContent = `
+${copName}:
+  Enabled: false
+`;
+
+    const rubocopYamlPath = path.join(workspaceFolder.uri.fsPath, '.rubocop.yml')
+    fs.appendFile(rubocopYamlPath, disableCopContent, () => {
+      if(onComplete) onComplete();
+    });
   }
 
   public executeAutocorrectOnSave(): boolean {
@@ -142,11 +51,11 @@ export class Rubocop {
     return this.executeAutocorrect();
   }
 
-  public executeAutocorrect(): boolean {
-    vscode.window.activeTextEditor?.edit((editBuilder) => {
+  public executeAutocorrect(additionalArguments: string[] = [], onComplete?: () => void): boolean {
+    const promise = vscode.window.activeTextEditor?.edit((editBuilder) => {
       const document = vscode.window.activeTextEditor.document;
       const edits =
-        this.formattingProvider.provideDocumentFormattingEdits(document);
+        this.formattingProvider.getAutocorrectEdits(document, additionalArguments);
       // We only expect one edit from our formatting provider.
       if (edits.length === 1) {
         const edit = edits[0];
@@ -158,6 +67,8 @@ export class Rubocop {
         );
       }
     });
+
+    if(onComplete) promise.then(() => onComplete());
 
     return true;
   }
@@ -201,8 +112,10 @@ export class Rubocop {
             loc.length + loc.column - 1
           );
           const sev = this.severity(offence.severity);
-          const message = `${offence.message} (${offence.severity}:${offence.cop_name})`;
+          const correctableString = offence.correctable ? '[Correctable]' : ''
+          const message = offence.message;
           const diagnostic = new vscode.Diagnostic(range, message, sev);
+          diagnostic.source = `${correctableString}(${offence.severity}:${offence.cop_name})`
           diagnostics.push(diagnostic);
         });
         entries.push([uri, diagnostics]);

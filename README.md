@@ -31,6 +31,7 @@ When autoCorrect is enabled, the history of changing file is broken.
 - lint by executing the command "Ruby: lint by rubocop" (cmd+shift+p and type command)
 - auto correct when saving a file
 - auto correct command "Ruby: autocorrect by rubocop"
+- quick fixes so you can fix or ignore an error [PR with explanation](https://github.com/LoranKloeze/vscode-ruby-rubocop-revived/pull/7)
 
 ### Exclude file
 
