@@ -10,9 +10,9 @@ export function activate(context: vscode.ExtensionContext): void {
   context.subscriptions.push(diag);
 
   const rubocop = new Rubocop(diag);
-  const disposable = vscode.commands.registerCommand('ruby.rubocop', () => {
+  const disposable = vscode.commands.registerCommand('ruby.rubocop', (onComplete?: () => void) => {
     const document = vscode.window.activeTextEditor.document;
-    rubocop.execute(document);
+    rubocop.execute(document, onComplete);
   });
 
   context.subscriptions.push(disposable);
@@ -52,12 +52,39 @@ export function activate(context: vscode.ExtensionContext): void {
     rubocop.formattingProvider
   );
 
+  vscode.languages.registerCodeActionsProvider(
+    'ruby',
+    rubocop.quickFixProvider
+  );
+  vscode.languages.registerCodeActionsProvider(
+    'gemfile',
+    rubocop.quickFixProvider
+  );
+
   const autocorrectDisposable = vscode.commands.registerCommand(
     'ruby.rubocop.autocorrect',
-    () => {
-      return rubocop.executeAutocorrect();
+    (...args) => {
+      rubocop.executeAutocorrect(
+        args,
+        () => vscode.commands.executeCommand('ruby.rubocop')
+      );
     }
   );
 
   context.subscriptions.push(autocorrectDisposable);
+
+  const disableCopDisposable = vscode.commands.registerCommand(
+    'ruby.rubocop.disableCop',
+    (workspaceFolder?: vscode.WorkspaceFolder, copName?: string) => {
+      if(workspaceFolder === null || copName === null) return;
+
+      rubocop.disableCop(
+        workspaceFolder,
+        copName,
+        () => vscode.commands.executeCommand('ruby.rubocop')
+      );
+    }
+  );
+
+  context.subscriptions.push(disableCopDisposable);
 }

@@ -1,5 +1,6 @@
 # 0.9.3
 
+- Introduce quick fix functionality that gives you the possibility to fix or ignore one or more errors (thanks [@Verseth](https://github.com/Verseth)) 
 - Bugfix where even non-Ruby files were autocorrected (thanks [@Verseth](https://github.com/Verseth)) 
 
 # 0.9.2
