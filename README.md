@@ -1,7 +1,7 @@
 
 
 # Rubocop for Visual Studio Code - revived
-It seems the original extension at is no longer being maintained. Let's pick it up from here.
+It seems the original extension is no longer being maintained. Let's pick it up from here.
 
 Don't forget to give the extension a review in the marketplace.
 
