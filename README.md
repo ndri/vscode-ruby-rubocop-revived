@@ -7,17 +7,23 @@ Don't forget to give the extension a review in the marketplace.
 
 Marketplace: [https://marketplace.visualstudio.com/items?itemName=LoranKloeze.ruby-rubocop-revived](https://marketplace.visualstudio.com/items?itemName=LoranKloeze.ruby-rubocop-revived)
 
-# Docs from original repo
-
-![travis status](https://travis-ci.org/misogi/vscode-ruby-rubocop.svg?branch=master)
-
-Visual Studio Code で rubocop を実行するエクステンションです。
+# Docs
 
 This extension provides interfaces to rubocop for vscode.
 
 [rubocop](https://github.com/bbatsov/rubocop) is a code analyzer for ruby.
 
 ![exec on save](./images/onsave.gif)
+
+<img width="604" alt="Rubocop Quick Fix Tooltip - Correctable" src="https://user-images.githubusercontent.com/31414818/185810703-1edfe010-cd85-4a07-a5ee-a982d6eec214.png">
+
+<img width="284" alt="Rubocop Quick Fix List - Correctable" src="https://user-images.githubusercontent.com/31414818/185810725-6919d0be-0859-4a1d-b708-930e48aa0fda.png">
+
+<img width="647" alt="Rubocop Quick Fix Tooltip - Uncorrectable" src="https://user-images.githubusercontent.com/31414818/185810905-f6870228-ac9c-401a-9df0-76910a30981f.png">
+
+<img width="346" alt="Rubocop Quick Fix List - Uncorrectable" src="https://user-images.githubusercontent.com/31414818/185810938-9674ae32-dfed-4337-84b9-4a4840a38e51.png">
+
+![Rubocop Quick Fixes Demo](https://user-images.githubusercontent.com/31414818/185810560-bbc8363e-253e-4b84-9b5f-545949eb8712.gif)
 
 ## Problems
 
