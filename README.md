@@ -9,7 +9,7 @@ Marketplace: [https://marketplace.visualstudio.com/items?itemName=LoranKloeze.ru
 
 # Docs
 
-This extension provides interfaces to rubocop for vscode.
+This extension provides interfaces to rubocop for vscode. All versions of **Rubcop >= 1.30.0** are supported.
 
 [rubocop](https://github.com/bbatsov/rubocop) is a code analyzer for ruby.
 
