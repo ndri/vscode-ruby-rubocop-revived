@@ -1,3 +1,7 @@
+# 0.9.4
+- Use the Rubocop server when linting if useServer configuration option is set to true (thanks [@gurgeous](https://github.com/gurgeous))
+- Strip 'RuboCop server starting on' from Rubocop output (thanks [@gurgeous](https://github.com/gurgeous))
+
 # 0.9.3
 
 - Introduce quick fix functionality that gives you the possibility to fix or ignore one or more errors (thanks [@Verseth](https://github.com/Verseth)) 

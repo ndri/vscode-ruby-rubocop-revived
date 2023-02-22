@@ -133,6 +133,9 @@ ${copName}:
     const args = getCommandArguments(fileName)
       .concat(this.additionalArguments)
       .concat(jsonOutputFormat);
+    if (this.config.useServer) {
+      args.push('--server');
+    }
 
     const task = new Task(uri, (token) => {
       const process = this.executeRubocop(
@@ -205,13 +208,13 @@ ${copName}:
     }
 
     try {
-      rubocop = JSON.parse(output);
+      const json = output.replace(/^RuboCop server starting on.*?\n/, '');
+      rubocop = JSON.parse(json);
     } catch (e) {
       log("JSON.parse failed");
 
       if (e instanceof SyntaxError) {
-        const regex = /[\r\n \t]/g;
-        const message = output.replace(regex, ' ');
+        const message = output.replace(/\n/g, "\\n").replace(/\r/g, "\\r").replace(/\t/g, "\\t");
         const errorMessage = `Error on parsing output (It might non-JSON output) : "${message}"`;
         vscode.window.showWarningMessage(errorMessage);
 
