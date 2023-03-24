@@ -100,6 +100,11 @@
           "type": "boolean",
           "default": false,
           "description": "Suppress warnings from rubocop and attempt to run regardless. (Useful if you share a rubocop.yml file and run into unrecognized cop errors you know are okay.)"
+        },
+        "ruby.rubocop.hideDisableSuggestions": {
+          "type": "boolean",
+          "default": false,
+          "description": "Hide the 'Disable' suggestions, nudging to prefer fixing violations."
         }
       }
     }

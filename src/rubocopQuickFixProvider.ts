@@ -1,4 +1,5 @@
 import * as vscode from 'vscode';
+import { getConfig } from './configuration';
 
 const initialWhitespaceRegexp = /^\s+/
 const correctableDiagnosticRegexp = /^\[Correctable\]/;
@@ -57,14 +58,16 @@ export default class RubocopQuickFixProvider
     const autocorrectQuickFix = this.autocorrectCopInFile(copName, diagnostic);
     if(autocorrectQuickFix !== null) quickFixes.push(autocorrectQuickFix);
 
-    const ignoreCopForLineQuickFix = this.ignoreCopForLineQuickFix(document, copName, diagnostic);
-    if(ignoreCopForLineQuickFix !== null) quickFixes.push(ignoreCopForLineQuickFix);
+    const config = getConfig();
+    if (!config.hideDisableSuggestions) {
+      const ignoreCopForLineQuickFix = this.ignoreCopForLineQuickFix(document, copName, diagnostic);
+      if(ignoreCopForLineQuickFix !== null) quickFixes.push(ignoreCopForLineQuickFix);
 
-    quickFixes.push(this.disableCopForFileQuickFix(document, copName, diagnostic));
+      quickFixes.push(this.disableCopForFileQuickFix(document, copName, diagnostic));
 
-    const disableCopInRubocopYaml = this.disableCopInRubocopYaml(document, copName, diagnostic);
-    if(disableCopInRubocopYaml !== null) quickFixes.push(disableCopInRubocopYaml);
-
+      const disableCopInRubocopYaml = this.disableCopInRubocopYaml(document, copName, diagnostic);
+      if(disableCopInRubocopYaml !== null) quickFixes.push(disableCopInRubocopYaml);
+    }
     quickFixes.push(this.showCopDocumentation(copName, diagnostic));
 
     return quickFixes;

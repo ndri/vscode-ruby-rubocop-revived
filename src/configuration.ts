@@ -12,6 +12,7 @@ export interface RubocopConfig {
   useBundler: boolean;
   useServer: boolean;
   suppressRubocopWarnings: boolean;
+  hideDisableSuggestions: boolean;
 }
 
 const detectBundledRubocop: () => boolean = () => {
@@ -53,6 +54,7 @@ export const getConfig: () => RubocopConfig = () => {
   const useServer = conf.get('useServer', false);
   const configPath = conf.get('executePath', '');
   const suppressRubocopWarnings = conf.get('suppressRubocopWarnings', false);
+  const hideDisableSuggestions = conf.get('hideDisableSuggestions', false);
   let command: string;
 
   // if executePath is present in workspace config, use it.
@@ -79,6 +81,7 @@ export const getConfig: () => RubocopConfig = () => {
     useBundler,
     useServer,
     suppressRubocopWarnings,
+    hideDisableSuggestions,
   };
 };
 
