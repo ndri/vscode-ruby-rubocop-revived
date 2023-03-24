@@ -13,6 +13,19 @@ const rubocopDisableRegexp = /# rubocop:disable (((\w|\/)+)(,\s+((\w|\/)+))*)/
 // Group 2 is the list of cop names
 const rubocopEnableRegexp = /# rubocop:enable (((\w|\/)+)(,\s+((\w|\/)+))*)/
 
+
+const known_rubocop_departments = [
+  'bundler',
+  'gemspec',
+  'layout',
+  'lint',
+  'metrics',
+  'migration',
+  'naming',
+  'security',
+  'style',
+]
+
 export default class RubocopQuickFixProvider
   implements vscode.CodeActionProvider
 {
@@ -68,7 +81,9 @@ export default class RubocopQuickFixProvider
       const disableCopInRubocopYaml = this.disableCopInRubocopYaml(document, copName, diagnostic);
       if(disableCopInRubocopYaml !== null) quickFixes.push(disableCopInRubocopYaml);
     }
-    quickFixes.push(this.showCopDocumentation(copName, diagnostic));
+
+    const showDocumentationQuickFix = this.showCopDocumentation(copName, diagnostic);
+    if(showDocumentationQuickFix !== null) quickFixes.push(showDocumentationQuickFix);
 
     return quickFixes;
   }
@@ -94,9 +109,11 @@ export default class RubocopQuickFixProvider
     return quickFix;
   }
 
-  private showCopDocumentation(copName: string, diagnostic: vscode.Diagnostic): vscode.CodeAction {
+  private showCopDocumentation(copName: string, diagnostic: vscode.Diagnostic): vscode.CodeAction | null {
     const copNameArray = copName.split('/');
     const copDepartment = copNameArray[0].toLowerCase();
+    if (!known_rubocop_departments.includes(copDepartment)) return null;
+
     const copId = copNameArray[1].toLowerCase();
     const docsUri = `https://docs.rubocop.org/rubocop/cops_${copDepartment}.html#${copDepartment}${copId}`;
 
