@@ -59,8 +59,8 @@ gem install rubocop
 
 If VSCode market place is not configured in your FLOSS distribution of code (you have Open VSX instead):
 
-1. Go on [VSCode Marketplace](https://marketplace.visualstudio.com/items?itemName=misogi.ruby-rubocop) and clic on the [Download Extension](https://marketplace.visualstudio.com/_apis/public/gallery/publishers/misogi/vsextensions/ruby-rubocop/0.8.5/vspackage) button.
-2. Install the extension manually from the CLI: `code --install-extension misogi.ruby-rubocop-0.8.5.vsix`
+1. Go on [VSCode Marketplace](https://marketplace.visualstudio.com/items?itemName=LoranKloeze.ruby-rubocop-revived) and click on the [Download Extension](https://marketplace.visualstudio.com/_apis/public/gallery/publishers/LoranKloeze/vsextensions/ruby-rubocop-revived/0.9.4/vspackage) button.
+2. Install the extension manually from the CLI: `code --install-extension LoranKloeze.ruby-rubocop-revived-0.9.4.vsix`
 
 # ChangeLog
 
@@ -85,7 +85,7 @@ Specify configuration (via navigating to `File > Preferences > Workspace Setting
 
   // default true
   "ruby.rubocop.onSave": true
-  
+
   // use the --server option when running Rubocop - default false
   "ruby.rubocop.useServer": true
 }
