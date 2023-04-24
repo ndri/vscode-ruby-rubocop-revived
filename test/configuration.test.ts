@@ -22,6 +22,7 @@ vsStub.workspace.getConfiguration = (
     autocorrectOnSave: false,
     useBundler: false,
     suppressRubocopWarnings: false,
+    hideDisableSuggestions: false,
   };
 
   return {
@@ -73,6 +74,16 @@ describe('RubocopConfig', () => {
     describe('.suppressRubocopWarnings', () => {
       it('is set to false', () => {
         expect(getConfig()).to.have.property('suppressRubocopWarnings', false);
+      });
+    });
+
+    describe('.hideDisableSuggestions', () => {
+      it('is set', () => {
+        expect(getConfig()).to.have.property('hideDisableSuggestions');
+      });
+
+      it('is set to false by default', () => {
+        expect(getConfig()).to.have.property('hideDisableSuggestions', false);
       });
     });
 

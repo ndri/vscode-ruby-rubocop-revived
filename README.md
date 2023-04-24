@@ -88,6 +88,9 @@ Specify configuration (via navigating to `File > Preferences > Workspace Setting
 
   // use the --server option when running Rubocop - default false
   "ruby.rubocop.useServer": true
+
+  // If "true", it hides all the Disable/Ignore options, nudging to prefer fixing violations
+  "ruby.rubocop.hideDisableSuggestions": false
 }
 ```
 
