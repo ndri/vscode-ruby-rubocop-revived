@@ -241,6 +241,51 @@ describe('RubocopQuickFixProvider', () => {
       });
     });
 
+    describe('generates quick fixes for unknown cop department', () => {
+      let range: vscode.Range;
+      let quickFixes: vscode.CodeAction[];
+      let editor: vscode.TextEditor;
+      let filePath: string;
+
+      beforeEach(async function() {
+        this.timeout(5000);
+        await helper.closeAllEditors();
+
+        filePath = helper.createTempFile(
+          'file_to_quick_fix.rb',
+          fixtures.rubyFileToQuickFix
+        );
+        editor = await helper.openFile(filePath);
+
+        const diagnostic = new vscode.Diagnostic(
+          new vscode.Range(new vscode.Position(5, 0), new vscode.Position(5, 0)),
+`Literal \`{
+      car: 3, # some comment
+    boot: 56, bonnet: 10
+}\` used in void context.`,
+          vscode.DiagnosticSeverity.Warning
+        );
+        diagnostic.source = '(warning:Foo/Something)';
+        diagnostics.set(editor.document.uri, [diagnostic]);
+
+        range = new vscode.Range(new vscode.Position(5, 0), new vscode.Position(5, 0));
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        //@ts-ignore
+        quickFixes = instance.provideCodeActions(editor.document, range);
+
+        expect(quickFixes).to.be.instanceOf(Array);
+        expect(quickFixes.length).to.be.equal(2);
+      });
+
+      afterEach(() => {
+        fs.unlinkSync(filePath);
+      });
+
+      it('does not generate documentation quick fix', () => {
+        expect(quickFixes.filter((quickFix) => quickFix.title.includes('Show documentation for'))).to.be.empty;
+      });
+    });
+
     it('ignores another cop in the same line', async function() {
       let range: vscode.Range;
 
