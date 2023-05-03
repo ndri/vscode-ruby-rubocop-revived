@@ -1,3 +1,8 @@
+# 0.9.5
+- Hide 'Show documentation for...' quick fix for non-official cops (thanks [@marianosimone](https://github.com/marianosimone))
+- Add setting to hide Disable/Ignore suggestions (thanks [@marianosimone](https://github.com/marianosimone))
+- Add output channel (thanks [@gurgeous](https://github.com/gurgeous) and [@jgarber-cisco](https://github.com/jgarber-cisco))
+
 # 0.9.4
 - Use the Rubocop server when linting if useServer configuration option is set to true (thanks [@gurgeous](https://github.com/gurgeous))
 - Strip 'RuboCop server starting on' from Rubocop output (thanks [@gurgeous](https://github.com/gurgeous))

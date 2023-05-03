@@ -1,6 +1,6 @@
 {
   "name": "ruby-rubocop-revived",
-  "version": "0.9.4",
+  "version": "0.9.5",
   "publisher": "LoranKloeze",
   "displayName": "ruby-rubocop-revived",
   "description": "execute rubocop for current Ruby code.",
