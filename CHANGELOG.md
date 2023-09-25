@@ -1,3 +1,6 @@
+# 0.9.6 (not released)
+- Make the autocorrect argument configurable (thanks [@ndbroadbent](https://github.com/ndbroadbent))
+
 # 0.9.5
 - Hide 'Show documentation for...' quick fix for non-official cops (thanks [@marianosimone](https://github.com/marianosimone))
 - Add setting to hide Disable/Ignore suggestions (thanks [@marianosimone](https://github.com/marianosimone))
