@@ -80,6 +80,9 @@ Specify configuration (via navigating to `File > Preferences > Workspace Setting
   // "ruby.rubocop.executePath": "/Users/you/.rvm/gems/ruby-2.3.2/bin/"
   // "ruby.rubocop.executePath": "D:/bin/Ruby22-x64/bin/"
 
+  // Set to "--autocorrect-all" to enable "unsafe" auto-corrections
+  "ruby.rubocop.autocorrectArg": "--autocorrect",
+
   // If not specified, it assumes a null value by default.
   "ruby.rubocop.configFilePath": "/path/to/config/.rubocop.yml",
 
