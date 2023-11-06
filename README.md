@@ -1,4 +1,6 @@
+## Maintenance mode
 
+Unfortunately, I don't have the time anymore to support or maintain this extension. Feel free to fork the extension and publish your own version of the extension.
 
 # Rubocop for Visual Studio Code - revived
 It seems the original extension is no longer being maintained. Let's pick it up from here.
